@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEC Lab Manual Creator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --primary-dark: #303f9f;
+            --primary-light: #c5cae9;
+            --secondary-color: #ff4081;
+            --secondary-dark: #f50057;
+            --text-primary: #263238;
+            --text-secondary: #546e7a;
+            --text-light: #78909c;
+            --background-color: #f5f7fa;
+            --card-color: #ffffff;
+            --error-color: #f44336;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --info-color: #2196f3;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            padding: 40px 20px;
+            min-height: 100vh;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: var(--card-color);
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: var(--text-primary);
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .title-wrapper {
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .title-wrapper:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary-color);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 10px;
+        }
+
+        .form-title {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+        }
+
+        .form-subtitle {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        button,
+        .btn {
+            padding: 12px 28px;
+            background: linear-gradient(45deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(63, 81, 181, 0.2);
+        }
+
+        button:hover,
+        .btn:hover {
+            background: linear-gradient(45deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(63, 81, 181, 0.3);
+        }
+
+        button:active,
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        #form-section {
+            display: block;
+        }
+
+        .form-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .form-section-title {
+            grid-column: 1 / -1;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-top: 25px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-section-title i {
+            font-size: 1.2rem;
+        }
+
+        .form-section-title:not(:first-of-type) {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--primary-light);
+        }
+
+        .form-group {
+            margin-bottom: 5px;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            transition: var(--transition);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 2px solid var(--primary-light);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            color: var(--text-primary);
+            background-color: var(--card-color);
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.15);
+        }
+
+        input[type="text"]:focus+i,
+        input[type="number"]:focus+i {
+            color: var(--primary-color);
+        }
+
+        .helper-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 6px;
+            display: block;
+        }
+
+        .submit-btn-container {
+            grid-column: 1 / -1;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .submit-btn {
+            min-width: 200px;
+            padding: 16px 32px;
+            font-size: 18px;
+            border-radius: 50px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .submit-btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+            opacity: 0;
+            z-index: -1;
+            transition: var(--transition);
+        }
+
+        .submit-btn:hover:before {
+            opacity: 1;
+        }
+
+        #preview-section {
+            display: none;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .edit-btn {
+            background: linear-gradient(45deg, var(--success-color), #81c784);
+        }
+
+        .edit-btn:hover {
+            background: linear-gradient(45deg, #388e3c, var(--success-color));
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, var(--info-color), #64b5f6);
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(45deg, #1976d2, var(--info-color));
+        }
+
+        .manual-container {
+            width: 210mm;
+            height: 297mm;
+            max-width: 100%;
+            padding: 20mm 15mm;
+            background-color: white;
+            margin: 0 auto;
+            position: relative;
+            text-align: center;
+            border: 2px solid #000;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+        }
+
+        .manual-container:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .header h3 {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .header h4 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .contact {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        #college-logo {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            transition: var(--transition);
+        }
+
+        .main-title h2 {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 30px 0;
+            letter-spacing: 1px;
+        }
+
+        .subject-details {
+            margin: 40px 0;
+        }
+
+        .underlined {
+            display: inline-block;
+            border-bottom: 2px solid black;
+            padding-bottom: 4px;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .subject-code {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 25px 0;
+        }
+
+        .department {
+            margin: 25px 0 15px;
+        }
+
+        .semester {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 25px 0;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: absolute;
+            bottom: 15mm;
+            left: 0;
+            right: 0;
+            padding: 0 20mm;
+        }
+
+        .student-info {
+            text-align: left;
+        }
+
+        .student-info h4 {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .student-info p {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .faculty-info {
+            text-align: right;
+        }
+
+        .faculty-info p {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: var(--transition);
+            height: 0;
+            overflow: hidden;
+        }
+
+        input.invalid {
+            border-color: var(--error-color) !important;
+            background-color: rgba(244, 67, 54, 0.05);
+        }
+
+        .input-wrapper.invalid i {
+            color: var(--error-color);
+        }
+
+        .error-message.visible {
+            opacity: 1;
+            transform: translateY(0);
+            height: auto;
+            margin-bottom: 5px;
+        }
+
+        .success-checkmark {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--success-color);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .validated .success-checkmark {
+            opacity: 1;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+            position: relative;
+            grid-column: 1 / -1;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: var(--primary-light);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .step {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .step.active {
+            color: var(--primary-color);
+        }
+
+        .step.completed {
+            color: var(--success-color);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--primary-light);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .success-animation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .success-checkmark-circle {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 30px;
+            transform: scale(0);
+            animation: scaleUp 0.5s forwards;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--card-color);
+            color: var(--text-primary);
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+            transform: translateX(calc(100% + 30px));
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .toast.visible {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .toast-message {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+            box-shadow: none;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            color: var(--text-light);
+            cursor: help;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--text-primary);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 0.9;
+        }
+
+        .hover-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        @media screen and (max-width: 210mm) {
+            .manual-container {
+                width: 100%;
+                height: auto;
+                min-height: 297mm;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 15px;
+            }
+
+            .container {
+                padding: 25px 15px;
+            }
+
+            .form-layout {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .form-title {
+                font-size: 1.8rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            .footer {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .faculty-info {
+                text-align: left;
+            }
+
+            .toast {
+                left: 15px;
+                right: 15px;
+                bottom: 15px;
+                transform: translateY(calc(100% + 15px));
+            }
+
+            .toast.visible {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <p class="loading-text">Generating your lab manual...</p>
+    </div>
+
+    <div class="toast" id="toast">
+        <div class="toast-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">Success!</div>
+            <div class="toast-message">Your lab manual has been successfully generated.</div>
+        </div>
+        <button class="toast-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="container hover-card" id="form-section">
+        <div class="title-wrapper">
+            <h1 class="form-title">KEC Lab Manual Creator</h1>
+            <h3 class="form-subtitle">Create professional lab manual covers in seconds</h3>
+        </div>
+
+        <form id="lab-manual-form">
+            <div class="form-layout">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-steps">
+                        <span class="step active" id="step1">Subject Details</span>
+                        <span class="step" id="step2">Student Information</span>
+                        <span class="step" id="step3">Faculty Details</span>
+                    </div>
+                </div>
+
+                <div class="form-section-title">
+                    <i class="fas fa-book"></i> Subject Details
+                </div>
+
+                <div class="form-group">
+                    <label for="subjectName">Subject Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="subjectName" name="subjectName"
+                            placeholder="e.g., COMPUTER SYSTEM ARCHITECTURE LAB" maxlength="100" required>
+                        <i class="fas fa-book-open"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">The full name of the laboratory subject</span>
+                    <div class="error-message" id="subjectName-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid subject name (minimum 5
+                        characters)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="subjectCode">Subject Code</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="subjectCode" name="subjectCode" placeholder="e.g., B022421(022)"
+                            pattern="[A-Za-z0-9()\-]+" required>
+                        <i class="fas fa-hashtag"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">The official course code for the subject</span>
+                    <div class="error-message" id="subjectCode-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid subject code using letters,
+                        numbers, and symbols
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="semester">Semester Number</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="semester" name="semester" min="1" max="8" placeholder="1-8" required>
+                        <i class="fas fa-calendar-alt"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">The semester number (1-8)</span>
+                    <div class="error-message" id="semester-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid semester number (1-8)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="department">Department</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="department" name="department"
+                            placeholder="e.g., Computer Science & Engineering" maxlength="100" required>
+                        <i class="fas fa-university"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">Your academic department name</span>
+                    <div class="error-message" id="department-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid department name
+                    </div>
+                </div>
+
+                <div class="form-section-title">
+                    <i class="fas fa-user-graduate"></i> Student Information
+                </div>
+
+                <div class="form-group">
+                    <label for="studentName">Student Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="studentName" name="studentName" placeholder="Enter your full name"
+                            pattern="[A-Za-z\s]+" title="Please enter only letters and spaces" maxlength="50" required>
+                        <i class="fas fa-user"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">Your full name as per college records</span>
+                    <div class="error-message" id="studentName-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid name (letters and spaces only)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="rollNo">Roll Number</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="rollNo" name="rollNo" placeholder="e.g., 310002220XX" pattern="\d{1,12}"
+                            title="Please enter up to 12 digits only" maxlength="12"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
+                        <i class="fas fa-id-card"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">Your college roll number</span>
+                    <div class="error-message" id="rollNo-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid roll number (up to 12 digits)
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="branch">Branch</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="branch" name="branch" placeholder="e.g., CSE" pattern="[A-Za-z\s&]+"
+                            title="Please enter only letters, spaces and & symbol" maxlength="10" required>
+                        <i class="fas fa-code-branch"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">Your branch abbreviation (e.g., CSE, IT, ECE)</span>
+                    <div class="error-message" id="branch-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid branch name
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="batch">Batch/Academic Year</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="batch" name="batch" placeholder="e.g., 2024-25" pattern="[0-9\-]+"
+                            title="Please use format YYYY-YY" maxlength="7" required>
+                        <i class="fas fa-users"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">Your academic year in YYYY-YY format</span>
+                    <div class="error-message" id="batch-error">
+                        <i class="fas fa-exclamation-circle"></i> Please use format YYYY-YY (e.g., 2024-25)
+                    </div>
+                </div>
+
+                <div class="form-section-title">
+                    <i class="fas fa-chalkboard-teacher"></i> Faculty Details
+                </div>
+
+                <div class="form-group">
+                    <label for="facultyName">Faculty Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="facultyName" name="facultyName" placeholder="Enter faculty's full name"
+                            pattern="[A-Za-z\s\.]+" title="Please enter only letters, spaces and periods" maxlength="50"
+                            required>
+                        <i class="fas fa-user-tie"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">The full name of the faculty member</span>
+                    <div class="error-message" id="facultyName-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid faculty name
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="facultyDesignation">
+                        Faculty Designation
+                        <span class="tooltip">
+                            <i class="fas fa-question-circle"></i>
+                            <span class="tooltip-text">The official position of the faculty member (e.g., Asst.
+                                Professor, Professor)</span>
+                        </span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" id="facultyDesignation" name="facultyDesignation"
+                            placeholder="e.g., Asst. Professor" pattern="[A-Za-z\s\.]+"
+                            title="Please enter only letters, spaces and periods" maxlength="30" required>
+                        <i class="fas fa-briefcase"></i>
+                        <span class="success-checkmark"><i class="fas fa-check-circle"></i></span>
+                    </div>
+                    <span class="helper-text">The position title of the faculty member</span>
+                    <div class="error-message" id="facultyDesignation-error">
+                        <i class="fas fa-exclamation-circle"></i> Please enter a valid designation
+                    </div>
+                </div>
+
+                <div class="submit-btn-container">
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-file-pdf"></i> Generate Lab Manual Cover
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container hover-card" id="preview-section">
+        <div class="controls">
+            <button class="edit-btn" id="back-to-form">
+                <i class="fas fa-arrow-left"></i> Edit Details
+            </button>
+            <button id="download-btn" class="download-btn">
+                <i class="fas fa-download"></i> Download as PDF
+            </button>
+        </div>
+
+        <div class="manual-container" id="content-to-download">
+            <div class="header">
+                <h1>KRISHNA ENGINEERING COLLEGE</h1>
+                <h3>Khamharia, Junwani-Bhilai (C.G.)</h3>
+                <h4>(Run by Krishna Education Society)</h4>
+                <p class="contact">Website: kecbhilai.com, E-mail: krishnaengineeringcollege@gmail.com</p>
+            </div>
+
+            <div class="logo">
+                <img src="keclogo.jpg" alt="KEC Logo" id="college-logo">
+            </div>
+
+            <div class="main-title">
+                <h2>LAB MANUAL</h2>
+            </div>
+
+            <div class="subject-details">
+                <h3 class="underlined" id="subject-title"></h3>
+                <p class="subject-code">Subject Code : <span id="subject-code"></span></p>
+                <h3 class="department underlined" id="department-title"></h3>
+                <p class="semester">B.Tech.- <span id="semester-value"></span><sup>th</sup> Sem</p>
+            </div>
+
+            <div class="footer">
+                <div class="student-info">
+                    <h4>Submitted By:</h4>
+                    <p>Name: <span id="student-name-value"></span></p>
+                    <p id="roll-no-value">Roll No.: </p>
+                    <p id="branch-value">Branch: </p>
+                    <p id="batch-value">Batch: </p>
+                </div>
+
+                <div class="faculty-info">
+                    <p id="faculty-name-value"></p>
+                    <p id="faculty-designation-value"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formSection = document.getElementById('form-section');
+            const previewSection = document.getElementById('preview-section');
+            const labManualForm = document.getElementById('lab-manual-form');
+            const backButton = document.getElementById('back-to-form');
+            const downloadButton = document.getElementById('download-btn');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const toast = document.getElementById('toast');
+            const toastClose = document.querySelector('.toast-close');
+            const progressFill = document.getElementById('progress-fill');
+            const steps = [
+                document.getElementById('step1'),
+                document.getElementById('step2'),
+                document.getElementById('step3')
+            ];
+
+            clearLocalStorage();
+
+            const validationRules = {
+                subjectName: {
+                    pattern: /^[A-Za-z0-9\s&()]{5,}$/,
+                    message: 'Subject name must be at least 5 characters long'
+                },
+                subjectCode: {
+                    pattern: /^[A-Za-z0-9()\-]+$/,
+                    message: 'Enter a valid subject code'
+                },
+                semester: {
+                    pattern: /^[1-8]$/,
+                    message: 'Semester must be between 1 and 8'
+                },
+                department: {
+                    pattern: /^[A-Za-z\s&]{3,}$/,
+                    message: 'Enter a valid department name'
+                },
+                studentName: {
+                    pattern: /^[A-Za-z\s]{3,}$/,
+                    message: 'Enter a valid name (letters and spaces only)'
+                },
+                rollNo: {
+                    pattern: /^\d{1,12}$/,
+                    message: 'Enter a valid roll number (up to 12 digits)'
+                },
+                branch: {
+                    pattern: /^[A-Za-z&\s]{2,10}$/,
+                    message: 'Enter a valid branch name'
+                },
+                batch: {
+                    pattern: /^\d{4}-\d{2}$/,
+                    message: 'Use format YYYY-YY (e.g., 2024-25)'
+                },
+                facultyName: {
+                    pattern: /^[A-Za-z\s\.]{3,}$/,
+                    message: 'Enter a valid faculty name'
+                },
+                facultyDesignation: {
+                    pattern: /^[A-Za-z\s\.]{3,}$/,
+                    message: 'Enter a valid designation'
+                }
+            };
+
+            const fieldGroups = {
+                subject: ['subjectName', 'subjectCode', 'semester', 'department'],
+                student: ['studentName', 'rollNo', 'branch', 'batch'],
+                faculty: ['facultyName', 'facultyDesignation']
+            };
+
+            Object.keys(validationRules).forEach(fieldId => {
+                const input = document.getElementById(fieldId);
+                const inputWrapper = input.parentElement;
+                const errorElement = document.getElementById(`${fieldId}-error`);
+
+                input.addEventListener('input', () => {
+                    validateField(input, validationRules[fieldId], errorElement);
+                    updateProgressBar();
+                });
+
+                input.addEventListener('blur', () => {
+                    if (validateField(input, validationRules[fieldId], errorElement)) {
+                        inputWrapper.classList.add('validated');
+                    } else {
+                        inputWrapper.classList.remove('validated');
+                    }
+                    updateProgressBar();
+                });
+
+                input.addEventListener('focus', () => {
+                    inputWrapper.classList.add('focused');
+                });
+            });
+
+            labManualForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                let isValid = true;
+
+                Object.keys(validationRules).forEach(fieldId => {
+                    const input = document.getElementById(fieldId);
+                    const errorElement = document.getElementById(`${fieldId}-error`);
+
+                    if (!validateField(input, validationRules[fieldId], errorElement)) {
+                        isValid = false;
+                        if (!document.querySelector('.invalid')) {
+                            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                });
+
+                if (isValid) {
+                    loadingOverlay.classList.add('active');
+
+                    setTimeout(() => {
+                        saveFormValues();
+                        updateLabManual();
+
+                        loadingOverlay.classList.remove('active');
+
+                        formSection.style.display = 'none';
+                        previewSection.style.display = 'block';
+                        window.scrollTo(0, 0);
+
+                        showToast();
+                    }, 1500);
+                }
+            });
+
+            backButton.addEventListener('click', function () {
+                previewSection.style.display = 'none';
+                formSection.style.display = 'block';
+
+                window.scrollTo(0, 0);
+            });
+
+            downloadButton.addEventListener('click', function () {
+                loadingOverlay.classList.add('active');
+                loadingOverlay.querySelector('.loading-text').textContent = 'Generating PDF...';
+
+                setTimeout(() => {
+                    generatePDF();
+                }, 500);
+            });
+
+            toastClose.addEventListener('click', function () {
+                toast.classList.remove('visible');
+            });
+
+            function validateField(input, rule, errorElement) {
+                const value = input.value.trim();
+                const inputWrapper = input.parentElement;
+
+                if (!value) {
+                    showError(input, inputWrapper, errorElement, 'This field is required');
+                    return false;
+                }
+
+                if (!rule.pattern.test(value)) {
+                    showError(input, inputWrapper, errorElement, rule.message);
+                    return false;
+                }
+
+                hideError(input, inputWrapper, errorElement);
+                return true;
+            }
+
+            function showError(input, inputWrapper, errorElement, message) {
+                input.classList.add('invalid');
+                inputWrapper.classList.add('invalid');
+                input.classList.add('shake');
+                errorElement.textContent = message;
+                errorElement.classList.add('visible');
+                setTimeout(() => input.classList.remove('shake'), 500);
+            }
+
+            function hideError(input, inputWrapper, errorElement) {
+                input.classList.remove('invalid');
+                inputWrapper.classList.remove('invalid');
+                errorElement.classList.remove('visible');
+            }
+
+            function updateProgressBar() {
+                let validFieldsCount = 0;
+                const totalFields = Object.keys(validationRules).length;
+
+                Object.keys(validationRules).forEach(fieldId => {
+                    const input = document.getElementById(fieldId);
+                    const rule = validationRules[fieldId];
+                    if (rule.pattern.test(input.value.trim())) {
+                        validFieldsCount++;
+                    }
+                });
+
+                const progress = (validFieldsCount / totalFields) * 100;
+                progressFill.style.width = `${progress}%`;
+
+                updateStepStatus();
+            }
+
+            function updateStepStatus() {
+                let subjectValid = fieldGroups.subject.every(fieldId => {
+                    const rule = validationRules[fieldId];
+                    const value = document.getElementById(fieldId).value.trim();
+                    return rule.pattern.test(value);
+                });
+
+                let studentValid = fieldGroups.student.every(fieldId => {
+                    const rule = validationRules[fieldId];
+                    const value = document.getElementById(fieldId).value.trim();
+                    return rule.pattern.test(value);
+                });
+
+                let facultyValid = fieldGroups.faculty.every(fieldId => {
+                    const rule = validationRules[fieldId];
+                    const value = document.getElementById(fieldId).value.trim();
+                    return rule.pattern.test(value);
+                });
+
+                if (subjectValid) {
+                    steps[0].classList.remove('active');
+                    steps[0].classList.add('completed');
+                } else {
+                    steps[0].classList.add('active');
+                    steps[0].classList.remove('completed');
+                }
+
+                if (studentValid) {
+                    steps[1].classList.remove('active');
+                    steps[1].classList.add('completed');
+                } else if (subjectValid) {
+                    steps[1].classList.add('active');
+                    steps[1].classList.remove('completed');
+                } else {
+                    steps[1].classList.remove('active');
+                    steps[1].classList.remove('completed');
+                }
+
+                if (facultyValid) {
+                    steps[2].classList.remove('active');
+                    steps[2].classList.add('completed');
+                } else if (studentValid) {
+                    steps[2].classList.add('active');
+                    steps[2].classList.remove('completed');
+                } else {
+                    steps[2].classList.remove('active');
+                    steps[2].classList.remove('completed');
+                }
+            }
+
+            function showToast() {
+                toast.classList.add('visible');
+                setTimeout(() => {
+                    toast.classList.remove('visible');
+                }, 5000);
+            }
+
+            function clearLocalStorage() {
+                const fields = [
+                    'subjectName', 'subjectCode', 'semester', 'department',
+                    'studentName', 'rollNo', 'branch', 'batch',
+                    'facultyName', 'facultyDesignation'
+                ];
+
+                fields.forEach(field => {
+                    localStorage.removeItem(field);
+                });
+            }
+
+            function saveFormValues() {
+                const fields = [
+                    'subjectName', 'subjectCode', 'semester', 'department',
+                    'studentName', 'rollNo', 'branch', 'batch',
+                    'facultyName', 'facultyDesignation'
+                ];
+
+                fields.forEach(field => {
+                    const value = document.getElementById(field).value;
+                    localStorage.setItem(field, value);
+                });
+            }
+
+            function updateLabManual() {
+                document.getElementById('subject-title').textContent =
+                    document.getElementById('subjectName').value;
+
+                document.getElementById('subject-code').textContent =
+                    document.getElementById('subjectCode').value;
+
+                document.getElementById('department-title').textContent =
+                    formatDepartment(document.getElementById('department').value);
+
+                document.getElementById('semester-value').textContent =
+                    document.getElementById('semester').value;
+
+                document.getElementById('student-name-value').textContent =
+                    document.getElementById('studentName').value;
+
+                document.getElementById('roll-no-value').textContent =
+                    'Roll No.: ' + document.getElementById('rollNo').value;
+
+                document.getElementById('branch-value').textContent =
+                    'Branch: ' + document.getElementById('branch').value;
+
+                document.getElementById('batch-value').textContent =
+                    'Batch: ' + document.getElementById('batch').value;
+
+                document.getElementById('faculty-name-value').textContent =
+                    document.getElementById('facultyName').value;
+
+                document.getElementById('faculty-designation-value').textContent =
+                    document.getElementById('facultyDesignation').value;
+            }
+
+            function formatDepartment(dept) {
+                if (!dept.toLowerCase().includes('department')) {
+                    return 'Department of ' + dept;
+                }
+                return dept;
+            }
+
+            function generatePDF() {
+                const { jsPDF } = window.jspdf;
+
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                const element = document.getElementById('content-to-download');
+
+                html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                }).then(canvas => {
+                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const canvasWidth = canvas.width;
+                    const canvasHeight = canvas.height;
+
+                    const ratio = Math.min(pageWidth / canvasWidth, pageHeight / canvasHeight);
+                    const imgWidth = canvasWidth * ratio;
+                    const imgHeight = canvasHeight * ratio;
+
+                    const x = (pageWidth - imgWidth) / 2;
+                    const y = (pageHeight - imgHeight) / 2;
+
+                    pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
+
+                    const studentName = document.getElementById('studentName').value || 'Student';
+                    const safeName = studentName.replace(/\s+/g, '_');
+
+                    loadingOverlay.classList.remove('active');
+
+                    pdf.save(`KEC_Lab_Manual_${safeName}.pdf`);
+
+                    loadingOverlay.querySelector('.spinner').style.display = 'none';
+                    const successDiv = document.createElement('div');
+                    successDiv.className = 'success-animation';
+                    successDiv.innerHTML = `
+                        <div class="success-checkmark-circle">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h3>PDF Downloaded Successfully!</h3>
+                    `;
+
+                    loadingOverlay.appendChild(successDiv);
+                    loadingOverlay.classList.add('active');
+                    loadingOverlay.querySelector('.loading-text').style.display = 'none';
+
+                    setTimeout(() => {
+                        loadingOverlay.classList.remove('active');
+                        setTimeout(() => {
+                            loadingOverlay.querySelector('.spinner').style.display = 'block';
+                            loadingOverlay.querySelector('.loading-text').style.display = 'block';
+                            loadingOverlay.removeChild(successDiv);
+                        }, 500);
+                    }, 1500);
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
